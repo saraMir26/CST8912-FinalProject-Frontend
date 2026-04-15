@@ -1,9 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import ChatPage from "./pages/ChatPage";
-import ProfilePage from "./pages/ProfilePage";
-import FeedPage from "./pages/FeedPage";
+import Login from "./Pages/Login";
+import Register from "./Pages/Register";
+import ChatPage from "./Pages/ChatPage";
+import ProfilePage from "./Pages/ProfilePage";
+import FeedPage from "./Pages/FeedPage";
 
 export default function App() {
   return (
