@@ -1,19 +1,24 @@
 import { useEffect, useState } from "react";
 import client from "../api/client";
 import Navbar from "../components/Navbar";
+import { useNavigate } from "react-router-dom";
 
 export default function ProfilePage() {
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
   const [file, setFile] = useState(null);
   const [profileImageUrl, setProfileImageUrl] = useState("");
+  const navigate = useNavigate();
 
   const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
-    if (user?.id) {
-      loadProfile();
+    if (!user || !user.id) {
+      navigate("/");
+      return;
     }
+
+    loadProfile();
   }, []);
 
   const loadProfile = async () => {
@@ -21,7 +26,7 @@ export default function ProfilePage() {
       const res = await client.get(`/api/users/profile/${user.id}`);
       console.log("Profile response:", res.data);
 
-      if (res.data) {
+      if (res.data && typeof res.data === "object") {
         setDisplayName(res.data.displayName || "");
         setBio(res.data.bio || "");
         setProfileImageUrl(res.data.profileImageUrl || "");
@@ -39,12 +44,7 @@ export default function ProfilePage() {
         const formData = new FormData();
         formData.append("image", file);
 
-        const uploadRes = await client.post("/api/upload", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data"
-          }
-        });
-
+        const uploadRes = await client.post("/api/upload", formData);
         imageUrl = uploadRes.data.imageUrl;
       }
 
@@ -55,7 +55,6 @@ export default function ProfilePage() {
       });
 
       setProfileImageUrl(imageUrl);
-
       alert("Profile saved successfully!");
     } catch (error) {
       console.error("Error saving profile:", error);
@@ -66,7 +65,6 @@ export default function ProfilePage() {
   return (
     <div style={{ padding: "20px" }}>
       <Navbar />
-
       <h2>Profile Page</h2>
 
       <input

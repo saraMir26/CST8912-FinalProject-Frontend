@@ -15,11 +15,12 @@ export default function FeedPage() {
   const loadPosts = async () => {
     try {
       const res = await client.get("/api/posts");
-      console.log("Posts response:", res.data);
+      console.log("GET /api/posts response:", res.data);
 
       if (Array.isArray(res.data)) {
         setPosts(res.data);
       } else {
+        console.error("Posts response is not an array:", res.data);
         setPosts([]);
       }
     } catch (error) {
@@ -38,26 +39,21 @@ export default function FeedPage() {
         const formData = new FormData();
         formData.append("image", file);
 
-        const uploadRes = await client.post("/api/upload", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data"
-          }
-        });
-
+        const uploadRes = await client.post("/api/upload", formData);
         imageUrl = uploadRes.data.imageUrl;
       }
 
-      await client.post("/api/posts", {
+      const createRes = await client.post("/api/posts", {
         caption,
         imageUrl
       });
+
+      console.log("POST /api/posts response:", createRes.data);
 
       setCaption("");
       setFile(null);
 
       await loadPosts();
-
-      alert("Post created successfully!");
     } catch (error) {
       console.error("Error creating post:", error);
       alert("Failed to create post");
@@ -69,7 +65,6 @@ export default function FeedPage() {
   return (
     <div style={{ padding: "20px" }}>
       <Navbar />
-
       <h2>Feed Page</h2>
 
       <div style={{ marginBottom: "20px" }}>
@@ -98,37 +93,35 @@ export default function FeedPage() {
 
       <h3>All Posts</h3>
 
-      <div>
-        {Array.isArray(posts) && posts.length > 0 ? (
-          posts.map((post) => (
-            <div
-              key={post.id}
-              style={{
-                border: "1px solid #ccc",
-                padding: "15px",
-                marginBottom: "15px",
-                borderRadius: "8px"
-              }}
-            >
-              <h4>{post.username}</h4>
-              <p>{post.caption}</p>
+      {Array.isArray(posts) && posts.length > 0 ? (
+        posts.map((post) => (
+          <div
+            key={post.id}
+            style={{
+              border: "1px solid #ccc",
+              padding: "15px",
+              marginBottom: "15px",
+              borderRadius: "8px"
+            }}
+          >
+            <h4>{post.username}</h4>
+            <p>{post.caption}</p>
 
-              {post.imageUrl && (
-                <img
-                  src={post.imageUrl}
-                  alt="post"
-                  width="250"
-                  style={{ display: "block", marginTop: "10px" }}
-                />
-              )}
+            {post.imageUrl && (
+              <img
+                src={post.imageUrl}
+                alt="post"
+                width="250"
+                style={{ display: "block", marginTop: "10px" }}
+              />
+            )}
 
-              <small>{post.createdAt}</small>
-            </div>
-          ))
-        ) : (
-          <p>No posts yet.</p>
-        )}
-      </div>
+            <small>{post.createdAt}</small>
+          </div>
+        ))
+      ) : (
+        <p>No posts yet.</p>
+      )}
     </div>
   );
 }

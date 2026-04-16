@@ -13,10 +13,12 @@ export default function ChatPage() {
   const loadMessages = async () => {
     try {
       const res = await client.get("/api/chat");
+      console.log("GET /api/chat response:", res.data);
 
       if (Array.isArray(res.data)) {
         setMessages(res.data);
       } else {
+        console.error("Chat response is not an array:", res.data);
         setMessages([]);
       }
     } catch (error) {
@@ -29,14 +31,18 @@ export default function ChatPage() {
     if (!text.trim()) return;
 
     try {
-      await client.post("/api/chat", {
+      const res = await client.post("/api/chat", {
         text,
         chatRoom: "general"
       });
+
+      console.log("POST /api/chat response:", res.data);
+
       setText("");
-      loadMessages();
+      await loadMessages();
     } catch (error) {
       console.error("Error sending message:", error);
+      alert("Failed to send message");
     }
   };
 
@@ -46,10 +52,10 @@ export default function ChatPage() {
 
       <h2>Live Chat</h2>
 
-      <div>
+      <div style={{ marginBottom: "20px" }}>
         {Array.isArray(messages) && messages.length > 0 ? (
           messages.map((msg) => (
-            <div key={msg.id}>
+            <div key={msg.id} style={{ marginBottom: "10px" }}>
               <strong>{msg.senderName}:</strong> {msg.text}
             </div>
           ))
