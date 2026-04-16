@@ -11,6 +11,7 @@ export default function ChatPage() {
   const currentUser = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
+    console.log("Current user:", currentUser);
     loadUsers();
   }, []);
 
@@ -23,18 +24,19 @@ export default function ChatPage() {
   const loadUsers = async () => {
     try {
       const res = await client.get("/api/users");
-      console.log("Users response:", res.data);
+      console.log("GET /api/users:", res.data);
 
       if (Array.isArray(res.data)) {
-        const filteredUsers = res.data.filter(
-          (user) => String(user.id) !== String(currentUser?.id)
+        const filtered = res.data.filter(
+          (u) => String(u.id) !== String(currentUser?.id)
         );
-        setUsers(filteredUsers);
+        setUsers(filtered);
       } else {
         setUsers([]);
       }
     } catch (error) {
       console.error("Error loading users:", error);
+      console.error("Users response:", error?.response?.data);
       setUsers([]);
     }
   };
@@ -42,15 +44,11 @@ export default function ChatPage() {
   const loadMessages = async () => {
     try {
       const res = await client.get(`/api/chat?userId=${selectedUser.id}`);
-      console.log("Messages response:", res.data);
-
-      if (Array.isArray(res.data)) {
-        setMessages(res.data);
-      } else {
-        setMessages([]);
-      }
+      console.log("GET /api/chat:", res.data);
+      setMessages(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
       console.error("Error loading messages:", error);
+      console.error("Messages response:", error?.response?.data);
       setMessages([]);
     }
   };
@@ -59,15 +57,18 @@ export default function ChatPage() {
     if (!text.trim() || !selectedUser) return;
 
     try {
-      await client.post("/api/chat", {
+      const res = await client.post("/api/chat", {
         text,
         receiverId: selectedUser.id
       });
 
+      console.log("POST /api/chat:", res.data);
+
       setText("");
       await loadMessages();
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.error("Send message error:", error);
+      console.error("Send response:", error?.response?.data);
       alert("Failed to send message");
     }
   };
@@ -88,8 +89,7 @@ export default function ChatPage() {
                 style={{
                   padding: "10px",
                   cursor: "pointer",
-                  backgroundColor:
-                    selectedUser?.id === user.id ? "#eee" : "transparent",
+                  backgroundColor: selectedUser?.id === user.id ? "#eee" : "transparent",
                   borderRadius: "6px",
                   marginBottom: "8px"
                 }}
