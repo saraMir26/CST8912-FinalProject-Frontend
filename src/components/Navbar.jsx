@@ -11,7 +11,9 @@ export default function Navbar() {
 
   return (
     <nav style={{ padding: "15px", borderBottom: "1px solid #ccc", marginBottom: "20px" }}>
-      <Link to="/chat" style={{ marginRight: "15px" }}>Chat</Link>
+      <a href="/chat" target="_blank" rel="noreferrer" style={{ marginRight: "15px" }}>
+        Chat
+      </a>
       <Link to="/feed" style={{ marginRight: "15px" }}>Feed</Link>
       <Link to="/profile" style={{ marginRight: "15px" }}>Profile</Link>
       <button onClick={handleLogout}>Logout</button>

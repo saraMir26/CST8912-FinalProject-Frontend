@@ -1,18 +1,60 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import client from "../api/client";
 import Navbar from "../components/Navbar";
 
 export default function ProfilePage() {
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
+  const [file, setFile] = useState(null);
+  const [profileImageUrl, setProfileImageUrl] = useState("");
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  useEffect(() => {
+    if (user?.id) {
+      loadProfile();
+    }
+  }, []);
+
+  const loadProfile = async () => {
+    try {
+      const res = await client.get(`/api/users/profile/${user.id}`);
+      console.log("Profile response:", res.data);
+
+      if (res.data) {
+        setDisplayName(res.data.displayName || "");
+        setBio(res.data.bio || "");
+        setProfileImageUrl(res.data.profileImageUrl || "");
+      }
+    } catch (error) {
+      console.error("Error loading profile:", error);
+    }
+  };
 
   const handleSave = async () => {
     try {
+      let imageUrl = profileImageUrl;
+
+      if (file) {
+        const formData = new FormData();
+        formData.append("image", file);
+
+        const uploadRes = await client.post("/api/upload", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        });
+
+        imageUrl = uploadRes.data.imageUrl;
+      }
+
       await client.post("/api/users/profile", {
         displayName,
         bio,
-        profileImageUrl: ""
+        profileImageUrl: imageUrl
       });
+
+      setProfileImageUrl(imageUrl);
 
       alert("Profile saved successfully!");
     } catch (error) {
@@ -31,19 +73,32 @@ export default function ProfilePage() {
         placeholder="Display Name"
         value={displayName}
         onChange={(e) => setDisplayName(e.target.value)}
+        style={{ display: "block", marginBottom: "10px" }}
       />
 
-      <div style={{ marginTop: "10px" }}>
-        <textarea
-          placeholder="Bio"
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
-        />
-      </div>
+      <textarea
+        placeholder="Bio"
+        value={bio}
+        onChange={(e) => setBio(e.target.value)}
+        style={{ display: "block", marginBottom: "10px", width: "300px", height: "100px" }}
+      />
 
-      <div style={{ marginTop: "10px" }}>
-        <button onClick={handleSave}>Save Profile</button>
-      </div>
+      <input
+        type="file"
+        onChange={(e) => setFile(e.target.files[0])}
+        style={{ display: "block", marginBottom: "10px" }}
+      />
+
+      {profileImageUrl && (
+        <img
+          src={profileImageUrl}
+          alt="profile"
+          width="150"
+          style={{ display: "block", marginBottom: "10px" }}
+        />
+      )}
+
+      <button onClick={handleSave}>Save Profile</button>
     </div>
   );
 }
