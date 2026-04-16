@@ -24,9 +24,10 @@ export default function FeedPage() {
         setPosts([]);
       }
     } catch (error) {
-      console.error("Error loading posts:", error);
-      setPosts([]);
-    }
+        console.error("Error creating post:", error);
+        console.error("Create post response:", error?.response?.data);
+        alert(error?.response?.data?.message || "Failed to create post");
+      }
   };
 
   const createPost = async () => {

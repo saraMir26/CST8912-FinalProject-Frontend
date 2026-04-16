@@ -57,9 +57,10 @@ export default function ProfilePage() {
       setProfileImageUrl(imageUrl);
       alert("Profile saved successfully!");
     } catch (error) {
-      console.error("Error saving profile:", error);
-      alert("Failed to save profile");
-    }
+        console.error("Error saving profile:", error);
+        console.error("Save profile response:", error?.response?.data);
+        alert(error?.response?.data?.message || "Failed to save profile");
+      }
   };
 
   return (
