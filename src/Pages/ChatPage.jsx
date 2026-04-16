@@ -3,24 +3,36 @@ import client from "../api/client";
 import Navbar from "../components/Navbar";
 
 export default function ChatPage() {
+  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
 
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+
   useEffect(() => {
-    loadMessages();
+    loadUsers();
   }, []);
+
+  useEffect(() => {
+    if (selectedUser) {
+      loadMessages();
+    }
+  }, [selectedUser]);
+
+  const loadUsers = async () => {
+    try {
+      const res = await client.get("/api/users");
+      setUsers(res.data);
+    } catch (error) {
+      console.error("Error loading users:", error);
+    }
+  };
 
   const loadMessages = async () => {
     try {
-      const res = await client.get("/api/chat");
-      console.log("GET /api/chat response:", res.data);
-
-      if (Array.isArray(res.data)) {
-        setMessages(res.data);
-      } else {
-        console.error("Chat response is not an array:", res.data);
-        setMessages([]);
-      }
+      const res = await client.get(`/api/chat?userId=${selectedUser.id}`);
+      setMessages(Array.isArray(res.data) ? res.data : []);
     } catch (error) {
       console.error("Error loading messages:", error);
       setMessages([]);
@@ -28,48 +40,71 @@ export default function ChatPage() {
   };
 
   const sendMessage = async () => {
-    if (!text.trim()) return;
+    if (!text.trim() || !selectedUser) return;
 
     try {
-      const res = await client.post("/api/chat", {
+      await client.post("/api/chat", {
         text,
-        chatRoom: "general"
+        receiverId: selectedUser.id
       });
 
-      console.log("POST /api/chat response:", res.data);
-
       setText("");
-      await loadMessages();
+      loadMessages();
     } catch (error) {
       console.error("Error sending message:", error);
-      alert("Failed to send message");
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={{ display: "flex", height: "100vh" }}>
       <Navbar />
 
-      <h2>Live Chat</h2>
+      {/* LEFT SIDE USERS */}
+      <div style={{ width: "250px", borderRight: "1px solid #ccc", padding: "10px" }}>
+        <h3>Users</h3>
 
-      <div style={{ marginBottom: "20px" }}>
-        {Array.isArray(messages) && messages.length > 0 ? (
-          messages.map((msg) => (
-            <div key={msg.id} style={{ marginBottom: "10px" }}>
-              <strong>{msg.senderName}:</strong> {msg.text}
+        {users
+          .filter((u) => u.id !== currentUser.id)
+          .map((user) => (
+            <div
+              key={user.id}
+              onClick={() => setSelectedUser(user)}
+              style={{
+                padding: "10px",
+                cursor: "pointer",
+                background: selectedUser?.id === user.id ? "#eee" : "transparent"
+              }}
+            >
+              {user.username}
             </div>
-          ))
-        ) : (
-          <p>No messages yet.</p>
-        )}
+          ))}
       </div>
 
-      <input
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder="Type a message"
-      />
-      <button onClick={sendMessage}>Send</button>
+      {/* RIGHT SIDE CHAT */}
+      <div style={{ flex: 1, padding: "20px" }}>
+        {selectedUser ? (
+          <>
+            <h3>Chat with {selectedUser.username}</h3>
+
+            <div style={{ height: "300px", overflowY: "auto", marginBottom: "10px" }}>
+              {messages.map((msg) => (
+                <div key={msg.id}>
+                  <strong>{msg.senderName}:</strong> {msg.text}
+                </div>
+              ))}
+            </div>
+
+            <input
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Type a message"
+            />
+            <button onClick={sendMessage}>Send</button>
+          </>
+        ) : (
+          <p>Select a user to start chatting</p>
+        )}
+      </div>
     </div>
   );
 }
