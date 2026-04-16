@@ -18,8 +18,9 @@ export default function Register() {
       alert("Registration successful!");
       navigate("/");
     } catch (error) {
-      console.error("Register error:", error);
-      alert("Registration failed");
+      console.error("Register error full:", error);
+      console.error("Register response:", error?.response?.data);
+      alert(error?.response?.data?.message || "Registration failed");
     }
   };
 
