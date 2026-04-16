@@ -8,6 +8,9 @@ export default function FeedPage() {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+  console.log("Current user in feed:", currentUser);
+
   useEffect(() => {
     loadPosts();
   }, []);
@@ -20,14 +23,13 @@ export default function FeedPage() {
       if (Array.isArray(res.data)) {
         setPosts(res.data);
       } else {
-        console.error("Posts response is not an array:", res.data);
         setPosts([]);
       }
     } catch (error) {
-        console.error("Error creating post:", error);
-        console.error("Create post response:", error?.response?.data);
-        alert(error?.response?.data?.message || "Failed to create post");
-      }
+      console.error("Error loading posts:", error);
+      console.error("Posts response:", error?.response?.data);
+      setPosts([]);
+    }
   };
 
   const createPost = async () => {
@@ -40,32 +42,52 @@ export default function FeedPage() {
         const formData = new FormData();
         formData.append("image", file);
 
-        const uploadRes = await client.post("/api/upload", formData);
+        const uploadRes = await client.post("/api/upload", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
+        });
+
         imageUrl = uploadRes.data.imageUrl;
       }
 
-      const createRes = await client.post("/api/posts", {
+      await client.post("/api/posts", {
         caption,
         imageUrl
       });
-
-      console.log("POST /api/posts response:", createRes.data);
 
       setCaption("");
       setFile(null);
 
       await loadPosts();
+      alert("Post created successfully!");
     } catch (error) {
       console.error("Error creating post:", error);
-      alert("Failed to create post");
+      console.error("Create post response:", error?.response?.data);
+      alert(error?.response?.data?.message || "Failed to create post");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deletePost = async (postId) => {
+    try {
+      console.log("Deleting post:", postId);
+      const res = await client.delete(`/api/posts/${postId}`);
+      console.log("Delete response:", res.data);
+      await loadPosts();
+      alert("Post deleted successfully");
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      console.error("Delete post response:", error?.response?.data);
+      alert(error?.response?.data?.message || "Failed to delete post");
     }
   };
 
   return (
     <div style={{ padding: "20px" }}>
       <Navbar />
+
       <h2>Feed Page</h2>
 
       <div style={{ marginBottom: "20px" }}>
@@ -95,31 +117,46 @@ export default function FeedPage() {
       <h3>All Posts</h3>
 
       {Array.isArray(posts) && posts.length > 0 ? (
-        posts.map((post) => (
-          <div
-            key={post.id}
-            style={{
-              border: "1px solid #ccc",
-              padding: "15px",
-              marginBottom: "15px",
-              borderRadius: "8px"
-            }}
-          >
-            <h4>{post.username}</h4>
-            <p>{post.caption}</p>
+        posts.map((post) => {
+          console.log("Post userId:", post.userId, "Current user id:", currentUser?.id);
 
-            {post.imageUrl && (
-              <img
-                src={post.imageUrl}
-                alt="post"
-                width="250"
-                style={{ display: "block", marginTop: "10px" }}
-              />
-            )}
+          return (
+            <div
+              key={post.id}
+              style={{
+                border: "1px solid #ccc",
+                padding: "15px",
+                marginBottom: "15px",
+                borderRadius: "8px"
+              }}
+            >
+              <h4>{post.username}</h4>
+              <p>{post.caption}</p>
 
-            <small>{post.createdAt}</small>
-          </div>
-        ))
+              {post.imageUrl && (
+                <img
+                  src={post.imageUrl}
+                  alt="post"
+                  width="250"
+                  style={{ display: "block", marginTop: "10px" }}
+                />
+              )}
+
+              {String(post.userId) === String(currentUser?.id) && (
+                <button
+                  onClick={() => deletePost(post.id)}
+                  style={{ marginTop: "10px" }}
+                >
+                  Delete Post
+                </button>
+              )}
+
+              <div style={{ marginTop: "10px" }}>
+                <small>{post.createdAt}</small>
+              </div>
+            </div>
+          );
+        })
       ) : (
         <p>No posts yet.</p>
       )}

@@ -1,9 +1,19 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import client from "../api/client";
+import { useEffect } from "react";
 
 export default function Login() {
   const navigate = useNavigate();
+
+ 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+    navigate("/feed");
+    }
+  }, [navigate]);
+
   const [form, setForm] = useState({
     email: "",
     password: ""
@@ -18,7 +28,7 @@ export default function Login() {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      navigate("/chat");
+      navigate("/feed");
     } catch (error) {
       console.error("Login error:", error);
       alert("Login failed");

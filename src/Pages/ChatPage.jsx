@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import client from "../api/client";
 import Navbar from "../components/Navbar";
+import { useNavigate } from "react-router-dom";
 
 export default function ChatPage() {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
+  const navigate = useNavigate();
 
   const currentUser = JSON.parse(localStorage.getItem("user"));
 
@@ -94,7 +96,19 @@ export default function ChatPage() {
                   marginBottom: "8px"
                 }}
               >
-                {user.username}
+                <div
+                  style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+                >
+                  <span>{user.username}</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/user/${user.id}`);
+                    }}
+                  >
+                    View
+                  </button>
+                </div>
               </div>
             ))
           ) : (

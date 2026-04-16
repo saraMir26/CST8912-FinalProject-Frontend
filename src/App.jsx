@@ -4,6 +4,7 @@ import Register from "./Pages/Register";
 import ChatPage from "./Pages/ChatPage";
 import ProfilePage from "./Pages/ProfilePage";
 import FeedPage from "./Pages/FeedPage";
+import UserProfilePage from "./Pages/UserProfilePage";
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/feed" element={<FeedPage />} />
+        <Route path="/user/:id" element={<UserProfilePage />} />
       </Routes>
     </BrowserRouter>
   );
