@@ -1,49 +1,49 @@
 import { useState } from "react";
 import client from "../api/client";
+import Navbar from "../components/Navbar";
 
 export default function ProfilePage() {
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
-  const [file, setFile] = useState(null);
 
   const handleSave = async () => {
-    let profileImageUrl = "";
-
-    if (file) {
-      const formData = new FormData();
-      formData.append("image", file);
-
-      const uploadRes = await client.post("/api/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" }
+    try {
+      await client.post("/api/users/profile", {
+        displayName,
+        bio,
+        profileImageUrl: ""
       });
 
-      profileImageUrl = uploadRes.data.imageUrl;
+      alert("Profile saved successfully!");
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      alert("Failed to save profile");
     }
-
-    await client.post("/api/users/profile", {
-      displayName,
-      bio,
-      profileImageUrl
-    });
-
-    alert("Profile saved");
   };
 
   return (
-    <div>
-      <h2>Profile</h2>
+    <div style={{ padding: "20px" }}>
+      <Navbar />
+
+      <h2>Profile Page</h2>
+
       <input
-        placeholder="Display name"
+        placeholder="Display Name"
         value={displayName}
         onChange={(e) => setDisplayName(e.target.value)}
       />
-      <textarea
-        placeholder="Bio"
-        value={bio}
-        onChange={(e) => setBio(e.target.value)}
-      />
-      <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-      <button onClick={handleSave}>Save Profile</button>
+
+      <div style={{ marginTop: "10px" }}>
+        <textarea
+          placeholder="Bio"
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
+        />
+      </div>
+
+      <div style={{ marginTop: "10px" }}>
+        <button onClick={handleSave}>Save Profile</button>
+      </div>
     </div>
   );
 }

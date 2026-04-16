@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import client from "../api/client";
+import Navbar from "../components/Navbar";
 
 export default function ChatPage() {
   const [messages, setMessages] = useState([]);
@@ -12,7 +13,6 @@ export default function ChatPage() {
   const loadMessages = async () => {
     try {
       const res = await client.get("/api/chat");
-      console.log("Chat response:", res.data);
 
       if (Array.isArray(res.data)) {
         setMessages(res.data);
@@ -42,6 +42,8 @@ export default function ChatPage() {
 
   return (
     <div style={{ padding: "20px" }}>
+      <Navbar />
+
       <h2>Live Chat</h2>
 
       <div>

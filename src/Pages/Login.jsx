@@ -1,40 +1,61 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import client from "../api/client";
 
 export default function Login() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({
+    email: "",
+    password: ""
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await client.post("/api/auth/login", form);
+    try {
+      const res = await client.post("/api/auth/login", form);
 
-    localStorage.setItem("token", res.data.token);
-    localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
 
-    navigate("/chat");
+      navigate("/chat");
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Login failed");
+    }
   };
 
   return (
-    <div>
+    <div style={{ padding: "20px" }}>
       <h2>Login</h2>
+
       <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-        />
-        <button type="submit">Login</button>
+        <div>
+          <input
+            type="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+          />
+        </div>
+
+        <div style={{ marginTop: "10px" }}>
+          <input
+            type="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+          />
+        </div>
+
+        <div style={{ marginTop: "10px" }}>
+          <button type="submit">Login</button>
+        </div>
       </form>
+
+      <p style={{ marginTop: "15px" }}>
+        Don’t have an account? <Link to="/register">Register here</Link>
+      </p>
     </div>
   );
 }

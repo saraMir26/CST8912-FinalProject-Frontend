@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import client from "../api/client";
+import Navbar from "../components/Navbar";
 
 export default function FeedPage() {
   const [posts, setPosts] = useState([]);
@@ -12,7 +13,6 @@ export default function FeedPage() {
   const loadPosts = async () => {
     try {
       const res = await client.get("/api/posts");
-      console.log("Posts response:", res.data);
 
       if (Array.isArray(res.data)) {
         setPosts(res.data);
@@ -41,6 +41,8 @@ export default function FeedPage() {
 
   return (
     <div style={{ padding: "20px" }}>
+      <Navbar />
+
       <h2>Feed Page</h2>
 
       <input
@@ -53,7 +55,7 @@ export default function FeedPage() {
       <div style={{ marginTop: "20px" }}>
         {Array.isArray(posts) && posts.length > 0 ? (
           posts.map((post) => (
-            <div key={post.id}>
+            <div key={post.id} style={{ marginBottom: "15px" }}>
               <h4>{post.username}</h4>
               <p>{post.caption}</p>
             </div>
