@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import client from "../api/client";
 import Navbar from "../components/Navbar";
+import { useNavigate } from "react-router-dom";
 
 export default function FeedPage() {
   const [posts, setPosts] = useState([]);
   const [caption, setCaption] = useState("");
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const currentUser = JSON.parse(localStorage.getItem("user"));
   console.log("Current user in feed:", currentUser);
@@ -85,12 +87,12 @@ export default function FeedPage() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="page-shell">
       <Navbar />
 
       <h2>Feed Page</h2>
 
-      <div style={{ marginBottom: "20px" }}>
+      <div className="page-container">
         <input
           type="text"
           placeholder="Write a caption"
@@ -121,24 +123,21 @@ export default function FeedPage() {
           console.log("Post userId:", post.userId, "Current user id:", currentUser?.id);
 
           return (
-            <div
-              key={post.id}
-              style={{
-                border: "1px solid #ccc",
-                padding: "15px",
-                marginBottom: "15px",
-                borderRadius: "8px"
-              }}
-            >
-              <h4>{post.username}</h4>
+            <div className="feed-column" key={post.id}>             
+            
+              <h4
+                className="post-author"
+                onClick={() => navigate(`/user/${post.userId}`)}
+              >
+                {post.username}
+              </h4>
               <p>{post.caption}</p>
 
               {post.imageUrl && (
                 <img
                   src={post.imageUrl}
                   alt="post"
-                  width="250"
-                  style={{ display: "block", marginTop: "10px" }}
+                  className="post-image"
                 />
               )}
 
@@ -151,7 +150,7 @@ export default function FeedPage() {
                 </button>
               )}
 
-              <div style={{ marginTop: "10px" }}>
+              <div className="feed-composer">
                 <small>{post.createdAt}</small>
               </div>
             </div>

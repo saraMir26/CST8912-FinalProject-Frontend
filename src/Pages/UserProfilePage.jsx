@@ -22,19 +22,26 @@ export default function UserProfilePage() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="page-shell">
       <Navbar />
 
       <h2>User Profile</h2>
 
       {profile ? (
-        <div>
+        <div className="page-container">
+        
           {profile.profileImageUrl && (
             <img
               src={profile.profileImageUrl}
               alt="profile"
-              width="150"
-              style={{ display: "block", marginBottom: "10px", borderRadius: "50%" }}
+              style={{
+                width: "150px",
+                height: "150px",
+                objectFit: "cover",
+                borderRadius: "50%",
+                display: "block",
+                marginBottom: "20px"
+              }}
             />
           )}
 

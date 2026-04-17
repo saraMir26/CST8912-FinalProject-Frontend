@@ -1,10 +1,11 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./Pages/Login";
+import Login from "./pages/Login";
 import Register from "./Pages/Register";
-import ChatPage from "./Pages/ChatPage";
-import ProfilePage from "./Pages/ProfilePage";
-import FeedPage from "./Pages/FeedPage";
-import UserProfilePage from "./Pages/UserProfilePage";
+import ChatPage from "./pages/ChatPage";
+import ProfilePage from "./pages/ProfilePage";
+import FeedPage from "./pages/FeedPage";
+import UserProfilePage from "./pages/UserProfilePage";
+import HomePage from "./pages/HomePage";
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/feed" element={<FeedPage />} />
         <Route path="/user/:id" element={<UserProfilePage />} />
+        <Route path="/home" element={<HomePage />} />
       </Routes>
     </BrowserRouter>
   );

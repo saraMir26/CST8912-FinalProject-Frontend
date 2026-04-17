@@ -1,23 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import client from "../api/client";
-import { useEffect } from "react";
+import "../App.css";
 
 export default function Login() {
   const navigate = useNavigate();
-
- 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-    navigate("/feed");
-    }
-  }, [navigate]);
-
   const [form, setForm] = useState({
     email: "",
     password: ""
   });
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/home");
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,44 +26,41 @@ export default function Login() {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      navigate("/feed");
+      navigate("/home");
     } catch (error) {
       console.error("Login error:", error);
-      alert("Login failed");
+      alert(error?.response?.data?.message || "Login failed");
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Login</h2>
+    <div className="auth-wrapper">
+      <div className="auth-card">
+        <h1 className="auth-title">Welcome back</h1>
+        <p className="auth-subtitle">Login to continue to your social cloud app.</p>
 
-      <form onSubmit={handleSubmit}>
-        <div>
+        <form onSubmit={handleSubmit} className="form-stack">
           <input
             type="email"
             placeholder="Email"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
           />
-        </div>
 
-        <div style={{ marginTop: "10px" }}>
           <input
             type="password"
             placeholder="Password"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
           />
-        </div>
 
-        <div style={{ marginTop: "10px" }}>
           <button type="submit">Login</button>
-        </div>
-      </form>
+        </form>
 
-      <p style={{ marginTop: "15px" }}>
-        Don’t have an account? <Link to="/register">Register here</Link>
-      </p>
+        <p className="auth-footer">
+          Don’t have an account? <Link to="/register">Register here</Link>
+        </p>
+      </div>
     </div>
   );
 }

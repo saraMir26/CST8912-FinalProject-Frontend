@@ -76,11 +76,11 @@ export default function ChatPage() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="page-shell">
       <Navbar />
 
-      <div style={{ display: "flex", gap: "20px" }}>
-        <div style={{ width: "250px", borderRight: "1px solid #ccc", paddingRight: "15px" }}>
+      <div className="page-container">
+        <div >
           <h3>Users</h3>
 
           {users.length > 0 ? (
@@ -91,9 +91,10 @@ export default function ChatPage() {
                 style={{
                   padding: "10px",
                   cursor: "pointer",
-                  backgroundColor: selectedUser?.id === user.id ? "#eee" : "transparent",
-                  borderRadius: "6px",
-                  marginBottom: "8px"
+                  borderRadius: "8px",
+                  backgroundColor:
+                    selectedUser?.id === user.id ? "#eef2ff" : "transparent",
+                  width: "100%"
                 }}
               >
                 <div

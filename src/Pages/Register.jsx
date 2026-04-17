@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import client from "../api/client";
+import "../App.css";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -25,44 +26,39 @@ export default function Register() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Register</h2>
+    <div className="auth-wrapper">
+      <div className="auth-card">
+        <h1 className="auth-title">Create account</h1>
+        <p className="auth-subtitle">Join and start sharing posts and chatting.</p>
 
-      <form onSubmit={handleSubmit}>
-        <div>
+        <form onSubmit={handleSubmit} className="form-stack">
           <input
             placeholder="Username"
             value={form.username}
             onChange={(e) => setForm({ ...form, username: e.target.value })}
           />
-        </div>
 
-        <div style={{ marginTop: "10px" }}>
           <input
             type="email"
             placeholder="Email"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
           />
-        </div>
 
-        <div style={{ marginTop: "10px" }}>
           <input
             type="password"
             placeholder="Password"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
           />
-        </div>
 
-        <div style={{ marginTop: "10px" }}>
           <button type="submit">Register</button>
-        </div>
-      </form>
+        </form>
 
-      <p style={{ marginTop: "15px" }}>
-        Already have an account? <Link to="/">Login here</Link>
-      </p>
+        <p className="auth-footer">
+          Already have an account? <Link to="/">Login here</Link>
+        </p>
+      </div>
     </div>
   );
 }

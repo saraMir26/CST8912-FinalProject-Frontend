@@ -64,7 +64,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="page-shell">
       <Navbar />
       <h2>Profile Page</h2>
 
@@ -92,8 +92,7 @@ export default function ProfilePage() {
         <img
           src={profileImageUrl}
           alt="profile"
-          width="150"
-          style={{ display: "block", marginBottom: "10px" }}
+          className="profile-image-large"
         />
       )}
 
